@@ -1,0 +1,37 @@
+-- 1. USERS TABLE INFO - Check if data is the same
+SELECT 'USERS_TABLE' AS Category,
+    COUNT(*) AS TotalUsers,
+    COUNT(CASE WHEN Email LIKE '%@gmail.com' THEN 1 END) AS GmailUsers,
+    COUNT(CASE WHEN Email LIKE 'AGN%' THEN 1 END) AS AGNUsers
+FROM Users;
+
+-- 2. EMAIL COLUMN DEFINITION - Check exact column setup
+SELECT 'EMAIL_COLUMN' AS Category,
+    c.name AS ColumnName,
+    t.name AS DataType,
+    c.max_length AS MaxLength,
+    c.is_nullable AS IsNullable,
+    c.collation_name AS ColumnCollation
+FROM sys.columns c
+JOIN sys.types t ON c.user_type_id = t.user_type_id
+WHERE c.object_id = OBJECT_ID('Users') AND c.name = 'Email';
+
+-- 3. SPECIFIC USER CHECK - Most important!
+SELECT 'SPECIFIC_USER' AS Category,
+    UserCode,
+    Email,
+    LEN(Email) AS EmailLength,
+    LEN(LTRIM(RTRIM(Email))) AS TrimmedEmailLength,
+    CASE WHEN Email = 'AGNBKBB860@gmail.com' THEN 'EXACT_MATCH' 
+         WHEN LOWER(Email) = 'agnbkbb860@gmail.com' THEN 'CASE_INSENSITIVE_MATCH'
+         ELSE 'NO_MATCH' END AS MatchType
+FROM Users 
+WHERE Email LIKE '%AGNBKBB860%' OR UserCode LIKE '%AGNBKBB860%';
+
+-- 4. TEST ADO.NET QUERY DIRECTLY
+SELECT 'DIRECT_TEST' AS Category,
+    UserCode,
+    Email
+FROM Users 
+WHERE Email = 'AGNBKBB860@gmail.com' 
+   OR LOWER(LTRIM(RTRIM(Email))) = LOWER(LTRIM(RTRIM('AGNBKBB860@gmail.com')));
